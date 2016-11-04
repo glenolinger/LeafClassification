@@ -1,0 +1,67 @@
+---
+title: "Leaf Classification Model"
+author: "Glen Olinger"
+date: "10/31/2016"
+output: html_document
+---
+
+# Leaf Classification Project
+
+```{r setup, include=FALSE}
+library(readr)
+library( caret )
+library( rattle )
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+### Load the training data
+```{r}
+data <- read_csv( "train.csv" )
+```
+### Create a test/verification data set
+```{r data}
+trainIx <- createDataPartition( y=data$species, p=.7, list=FALSE )
+
+trainData <- data[trainIx,]
+testData <- data[-trainIx,]
+```
+### Preprocess the Data
+```{r}
+trainData <- trainData[,-1]
+testData <- testData[,-1]
+```
+### Look at the Training Data
+```{r}
+nrow( trainData )
+```
+### Look at the Testing Data
+```{r}
+nrow( testData )
+```
+
+# Model
+## Build a Model
+```{r}
+model <- train( species ~ ., method="rf", data=trainData )
+print( model$finalModel )
+```
+
+# Verification
+```{r}
+classPredict <- predict( model, newdata=testData )
+
+classResults <- testData$species == classPredict
+correct = sum( classResults==TRUE )
+incorrect = sum( classResults==FALSE )
+```
+
+### Correct Predictions
+```{r}
+correct
+```
+
+### Percent Correct
+```{r}
+correct/(correct+incorrect)*100
+```
