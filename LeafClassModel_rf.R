@@ -4,8 +4,29 @@ library(readr)
 library( caret )
 library( rattle )
 
-data <- read_csv( "train.csv" )
-trainIx <- createDataPartition( y=data$species, p=.8, list=FALSE )
+# Load the training data
+leafData <- read_csv( "train.csv" )
+
+# Partition the data
+dataSplitIndex <- function( data, percentTrain ) {
+  index <- createDataPartition( y=data, p=percent, list=FALSE )
+  return( index )
+}
+
+dataFoldsIx <- function( data, numfolds ) {
+  foldsIx <- createFolds( y=data, k = numFolds, list = TRUE, returnTrain = FALSE )
+  return( foldsIx )
+}
+
+set.seed(253)
+sampleSetIx <- function( data, numSets, percent ) {
+  ssIx <- sample(1:3, size=nrow(data), replace=FALSE, prob=percent )
+  return( ssIx )
+}
+#train <- data[ssIx==1,]
+#test <- data[ssIx==2,]
+
+trainIx <- dataSplitIndex( leafData$species, .7 )
 
 trainData <- data[trainIx,]
 testData <- data[-trainIx,]
@@ -27,7 +48,7 @@ print( model$finalModel )
 classPredict <- predict( model, newdata=testData )
 
 classResults <- testData$species == classPredict
-correct = sum( classResults==TRUE )
+excorrect = sum( classResults==TRUE )
 incorrect = sum( classResults==FALSE )
 
 print( sprintf( "Correct predictions: %d", correct ))
